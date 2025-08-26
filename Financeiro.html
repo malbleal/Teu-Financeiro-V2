@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teu Financeiro V2</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+        }
+        
+        .sidebar {
+            background-color: var(--dark-color);
+            color: white;
+            height: calc(100vh - 56px);
+            position: fixed;
+            padding-top: 20px;
+        }
+        
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 15px 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar a:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .summary-card {
+            text-align: center;
+            padding: 15px;
+        }
+        
+        .income {
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .expense {
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .balance {
+            border-left: 5px solid #3498db;
+        }
+        
+        .transaction-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .transaction-item {
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        
+        .income-item {
+            border-left-color: #2ecc71;
+        }
+        
+        .expense-item {
+            border-left-color: #e74c3c;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-wallet2"></i> Teu Financeiro V2
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-person-circle"></i> Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Sair</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar d-md-block">
+                <a href="#" class="active"><i class="bi bi-house-door"></i> Dashboard</a>
+                <a href="#"><i class="bi bi-arrow-down-circle"></i> Receitas</a>
+                <a href="#"><i class="bi bi-arrow-up-circle"></i> Despesas</a>
+                <a href="#"><i class="bi bi-graph-up"></i> Relatórios</a>
+                <a href="#"><i class="bi bi-tags"></i> Categorias</a>
+                <a href="#"><i class="bi bi-calendar-event"></i> Planejamento</a>
+                <a href="#"><i class="bi bi-wallet2"></i> Contas</a>
+                <a href="#"><i class="bi bi-question-circle"></i> Ajuda</a>
+            </div>
+
+            <!-- Main Content -->
+            <main class="col-md-9 col-lg-10 main-content">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="mb-4">Dashboard Financeiro</h2>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card summary-card income">
+                            <div class="card-body">
+                                <h5 class="card-title">Receitas</h5>
+                                <h3 class="card-text">R$ 5.250,00</h3>
+                                <p class="text-muted"><i class="bi bi-arrow-up"></i> 12% desde o mês passado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card summary-card expense">
+                            <div class="card-body">
+                                <h5 class="card-title">Despesas</h5>
+                                <h3 class="card-text">R$ 3.480,00</h3>
+                                <p class="text-muted"><i class="bi bi-arrow-down"></i> 5% desde o mês passado</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card summary-card balance">
+                            <div class="card-body">
+                                <h5 class="card-title">Saldo</h5>
+                                <h3 class="card-text">R$ 1.770,00</h3>
+                                <p class="text-muted"><i class="bi bi-arrow-up"></i> 28% desde o mês passado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Transactions -->
+                <div class="row mt-4">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Visão Geral Financeira</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="financeChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Distribuição de Gastos</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="expenseChart" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Últimas Transações</h5>
+                                <button class="btn btn-sm btn-primary"><i class="bi bi-plus-circle"></i> Nova Transação</button>
+                            </div>
+                            <div class="card-body">
+                                <div class="transaction-list">
+                                    <div class="transaction-item income-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6>Salário</h6>
+                                                <small class="text-muted">15/08/2023 - Receita</small>
+                                            </div>
+                                            <div class="text-success">
+                                                <strong>R$ 3.500,00</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="transaction-item expense-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6>Aluguel</h6>
+                                                <small class="text-muted">10/08/2023 - Moradia</small>
+                                            </div>
+                                            <div class="text-danger">
+                                                <strong>R$ 1.200,00</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="transaction-item expense-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6>Supermercado</h6>
+                                                <small class="text-muted">08/08/2023 - Alimentação</small>
+                                            </div>
+                                            <div class="text-danger">
+                                                <strong>R$ 450,00</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="transaction-item income-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6>Freelance</h6>
+                                                <small class="text-muted">05/08/2023 - Receita</small>
+                                            </div>
+                                            <div class="text-success">
+                                                <strong>R$ 1.200,00</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="transaction-item expense-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div>
+                                                <h6>Internet</h6>
+                                                <small class="text-muted">03/08/2023 - Utilidades</small>
+                                            </div>
+                                            <div class="text-danger">
+                                                <strong>R$ 120,00</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Gráfico de visão geral financeira
+        const financeCtx = document.getElementById('financeChart').getContext('2d');
+        const financeChart = new Chart(financeCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
+                datasets: [
+                    {
+                        label: 'Receitas',
+                        data: [4200, 4300, 4500, 4700, 4900, 5100, 5300, 5250],
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Despesas',
+                        data: [3800, 3700, 3900, 4000, 4100, 3900, 3700, 3480],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Evolução Mensal'
+                    }
+                }
+            }
+        });
+
+        // Gráfico de distribuição de gastos
+        const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+        const expenseChart = new Chart(expenseCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Moradia', 'Alimentação', 'Transporte', 'Lazer', 'Saúde', 'Outros'],
+                datasets: [{
+                    data: [35, 20, 15, 10, 12, 8],
+                    backgroundColor: [
+                        '#3498db',
+                        '#2ecc71',
+                        '#e74c3c',
+                        '#f1c40f',
+                        '#9b59b6',
+                        '#95a5a6'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
